@@ -62,7 +62,7 @@ this sample show you different technique to build a purge with cosmosdb mongo AP
 
 
 
-2  With mongo command run the init.js file https://github.com/emdeletaede/init.js
+2  With mongo command run the init.js file https://github.com/emdeletaede/build-a-purge-script-with-cosmosdb-mongo-API/blob/master/init.js
 
 
 
