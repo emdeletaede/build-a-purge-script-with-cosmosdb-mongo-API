@@ -31,10 +31,10 @@ we will create a new DB testbulk with a collection inside and insert in bulk sam
 
 
 3 begin some test of delete 
-    to delete you have 3 options 
-        Deletemany command 
-        use bulkremove command
-        use bulkremoveOne command
+    to delete you have 3 options : 
+       - Deletemany command 
+       - use bulkremove command
+       - use bulkremoveOne command
 . 
 
 
