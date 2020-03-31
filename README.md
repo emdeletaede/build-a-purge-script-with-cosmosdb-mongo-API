@@ -12,7 +12,7 @@ this sample show you different technique to build a purge with cosmosdb mongo AP
 ## Setup instructions
 
 
-1  create a new Azure Cosmos DB account for mongo API : .
+1  create a new Azure Cosmos DB account for mongo API :
 
 
 
@@ -32,10 +32,20 @@ we will create a new DB testbulk with a collection inside and insert in bulk sam
 
 3 begin some test of delete 
     to delete you have 3 options : 
+    
+    
+    
        - Deletemany command 
-       - use bulkremove command
-       - use bulkremoveOne command
+    
+    
+        - use bulkremove command
+        
+        
+        
+        - use bulkremoveOne command
 . 
+
+
 
 
 lets try a deletemany with the command db.col.deleteMany({"y":2}) the result is delete 100 lines and when i made a db.runCommand({ getLastRequestStatistics: 1 } ) to have the last information i have the following statistics 
