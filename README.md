@@ -48,37 +48,32 @@ we will create a new DB testbulk with a collection inside and insert in bulk sam
 
 
 
-lets try a deletemany with the command db.col.deleteMany({"y":2}) the result is delete 100 lines and when i made a db.runCommand({ getLastRequestStatistics: 1 } ) 
+lets try a deletemany with the command db.col.deleteMany({"y":2}) the result is delete 100 lines and when i run the following command : 
 
 
 
-to have the last information i have the following statistics 
+
+    db.runCommand({ getLastRequestStatistics: 1 } ) 
 
 
 
-{
-        "CommandName" : "delete",
+    {      
+         "CommandName" : "delete",
         "RequestCharge" : 1110.669999999998,
         "RequestDurationInMilliSeconds" : NumberLong(713),
         "ActivityId" : "44d4febb-f72d-4c43-bf98-d733747d22e7",
         "ok" : 1
-}
+    }
 
 
 
 
 
-the cost in RU is high , the command is very quick 
+the cost in RU is high , the command is very quick  lest's try another method with a bulk remove command 
 
-lest's try another method with a bulk remove command 
+    var bulk = db.col.initializeUnorderedBulkOp();bulk.find( { "y" : 3 } ).remove();bulk.execute()
 
-var bulk = db.col.initializeUnorderedBulkOp();bulk.find( { "y" : 3 } ).remove();bulk.execute()
-
-
-
-
-
-BulkWriteResult({
+    BulkWriteResult({
         "writeErrors" : [ ],
         "writeConcernErrors" : [ ],
         "nInserted" : 0,
@@ -87,61 +82,42 @@ BulkWriteResult({
         "nModified" : 0,
         "nRemoved" : 100,
         "upserted" : [ ]
-})
+    })
 
 
 
 
-globaldb:PRIMARY> db.runCommand({ getLastRequestStatistics: 1 } )
-{
+    globaldb:PRIMARY> db.runCommand({ getLastRequestStatistics: 1 } )
+    {
         "CommandName" : "delete",
         "RequestCharge" : 1106.269999999998,
         "RequestDurationInMilliSeconds" : NumberLong(701),
         "ActivityId" : "bea6ba12-c222-4579-a9a8-25b0203f12f5",
         "ok" : 1
-}
+    }
 
 
 
+same the bulk command delete all the field ask in one shot and the cost is a little less expensive than before and time a little quicker .  let s try the last method with a removeOne method . you just need to be sure an index is build on the field you want to delete 
 
+    1 we will count the number of field to delete 
+        var max = db.col.find({y:7}).count();
 
+    2 we will delete all the field in a loop with removeOne 
+    while (max > 0) { var bulk = db.col.initializeUnorderedBulkOp();bulk.find( {y:7} ).removeOne();bulk.execute();max --;}
+    1
 
-same the bulk command delete all the field ask in one shot and the cost is a little less expensive than before and time a little quicker . 
+    the operation will take more time , but when we look in the statistics , every delete take a charge of 10 RU 
 
-let s try the last method with a removeOne method . you just need to be sure an index is build on the field you want to delete 
+    db.runCommand({ getLastRequestStatistics: 1 } )
 
-1 we will count the number of field to delete 
- var max = db.col.find({y:7}).count();
-
-
-
-
-2 we will delete all the field in a loop with removeOne 
-while (max > 0) { var bulk = db.col.initializeUnorderedBulkOp();bulk.find( {y:7} ).removeOne();bulk.execute();max --;}
-1
-
-
-
-
-the operation will take more time , but when we look in the statistics , every delete take a charge of 10 RU 
-
-
-
-
-db.runCommand({ getLastRequestStatistics: 1 } )
-
-
-
-
-{
-        "CommandName" : "delete",
-        "RequestCharge" : 10.69,
-        "RequestDurationInMilliSeconds" : NumberLong(12),
+    {
+         "CommandName" : "delete",
+         "RequestCharge" : 10.69,
+         "RequestDurationInMilliSeconds" : NumberLong(12),
         "ActivityId" : "dc82dca6-8c76-444f-b802-5c157f9b2cfa",
         "ok" : 1
-}
-
-
+    }
 
 
 so the total time is longueur but you will need less RU/ secondes . So a tecnics to limit the need of RU/S use removeOne will be the best option , the total time will be more longueur but the need of RU/s will be less than the other command
